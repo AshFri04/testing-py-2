@@ -41,7 +41,11 @@ class PartyTestsDatabase(unittest.TestCase):
 
         self.client = app.test_client()
         app.config['TESTING'] = True
+        app.config['SECRET_KEY'] = 'key'
 
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['RSVP'] = True
         # Connect to test database   (uncomment when testing database)
         connect_to_db(app, "postgresql:///testdb")
 
@@ -58,7 +62,7 @@ class PartyTestsDatabase(unittest.TestCase):
 
     def test_games(self):
         #FIXME: test that the games page displays the game from example_data()
-        result = self.client.get("/games")
+        result = self.client.get("/games", follow_redirects=True)
         self.assertIn("Monopoly", result.data)
         
 
